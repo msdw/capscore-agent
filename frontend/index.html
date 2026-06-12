@@ -1072,7 +1072,9 @@
   <script>
     'use strict';
 
-    const API = 'http://localhost:8000';
+    // Same-origin by default: nginx proxies /jobs, /health to the API container.
+    // Override for static/file:// dev via window.CAPSCORE_API_BASE.
+    const API = (window.CAPSCORE_API_BASE || '').replace(/\/+$/, '');
 
     // ── Tab switching ──────────────────────────────────────────────────────────
 

@@ -12,6 +12,7 @@ import httpx
 
 from ..config import settings
 from ..models import ReproResult
+from ..llm import complete, strip_code_fences
 
 
 async def _fetch_readme(github_url: str, timeout: int = 10) -> str:
@@ -36,14 +37,8 @@ async def _llm_suggest_readme_fixes(
     repo_result: Optional[ReproResult],
     github_url: str,
 ) -> List[str]:
-    """Use Claude to generate targeted README improvement suggestions."""
-    if not settings.anthropic_api_key:
-        return _heuristic_readme_suggestions(readme_content, repo_result)
-
+    """Generate README suggestions via the shared LLM helper, with heuristic fallback."""
     try:
-        import anthropic
-        client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-
         issues_summary = ""
         if repo_result:
             missing = [k for k, v in repo_result.files_present.items() if not v]
@@ -72,21 +67,11 @@ Format as a JSON array of strings, each suggestion being 1-2 sentences. Focus on
 
 Return ONLY a valid JSON array of 5 strings, no markdown, no explanation."""
 
-        message = await client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=800,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
+        text = await complete(prompt, max_tokens=800, temperature=0)
+        if text is None:
+            return _heuristic_readme_suggestions(readme_content, repo_result)
 
-        text = message.content[0].text.strip()
-        if text.startswith("```"):
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-        text = text.strip()
-
-        suggestions = json.loads(text)
+        suggestions = json.loads(strip_code_fences(text))
         return [str(s) for s in suggestions[:5]]
 
     except Exception:

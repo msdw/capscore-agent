@@ -8,6 +8,7 @@ import httpx
 
 from ..models import ClaimReport, ClaimVerification
 from ..config import settings
+from ..llm import complete, strip_code_fences
 
 
 async def _fetch_url_content(url: str, timeout: int = 10) -> str:
@@ -24,21 +25,14 @@ async def _llm_verify_claims(
     evidence_text: str,
     strictness: str,
 ) -> List[ClaimVerification]:
-    """Use Claude to verify claims against evidence."""
-    if not settings.anthropic_api_key:
-        return _heuristic_verify(claims, evidence_text, strictness)
+    """Verify claims via the shared LLM helper (Anthropic→OpenAI→heuristic)."""
+    strictness_instructions = {
+        "lenient": "Be lenient — mark claims as supported if there's any plausible basis.",
+        "standard": "Be balanced — mark claims supported only if evidence clearly backs them.",
+        "strict": "Be strict — only mark supported if evidence explicitly and directly confirms.",
+    }
 
-    try:
-        import anthropic
-        client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-
-        strictness_instructions = {
-            "lenient": "Be lenient — mark claims as supported if there's any plausible basis.",
-            "standard": "Be balanced — mark claims supported only if evidence clearly backs them.",
-            "strict": "Be strict — only mark supported if evidence explicitly and directly confirms.",
-        }
-
-        prompt = f"""You are a claim verification specialist. Analyze each claim against the provided evidence.
+    prompt = f"""You are a claim verification specialist. Analyze each claim against the provided evidence.
 
 Evidence:
 {evidence_text[:3000]}
@@ -57,22 +51,12 @@ For each claim, return a JSON array with objects having these fields:
 
 Return ONLY valid JSON array, no markdown, no explanation."""
 
-        message = await client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2000,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
+    text = await complete(prompt, max_tokens=2000, temperature=0)
+    if text is None:
+        return _heuristic_verify(claims, evidence_text, strictness)
 
-        text = message.content[0].text.strip()
-        # Strip markdown code blocks if present
-        if text.startswith("```"):
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-        text = text.strip()
-
-        results = json.loads(text)
+    try:
+        results = json.loads(strip_code_fences(text))
         verifications = []
         for item in results:
             verifications.append(ClaimVerification(
@@ -83,9 +67,7 @@ Return ONLY valid JSON array, no markdown, no explanation."""
                 suggested_rewrite=item.get("suggested_rewrite", ""),
             ))
         return verifications
-
-    except Exception as e:
-        # Fallback to heuristic
+    except Exception:
         return _heuristic_verify(claims, evidence_text, strictness)
 
 

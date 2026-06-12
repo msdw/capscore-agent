@@ -1,0 +1,51 @@
+# Production stack for croo.maaihub.com
+#
+# Fronted by a Cloudflare Tunnel (no inbound ports exposed on the host).
+# The tunnel routes croo.maaihub.com -> frontend:80, and nginx proxies the
+# /health and /jobs API surface to the api container on the internal network.
+#
+# Requires TUNNEL_TOKEN in the environment (or .env). Bring up with:
+#   docker compose -f docker-compose.prod.yml up -d --build
+services:
+  api:
+    build: ./api
+    expose:
+      - '8000'
+    volumes:
+      - ./runs:/app/runs
+    env_file: .env
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  cap-provider:
+    build: ./cap-provider
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file: .env
+    restart: unless-stopped
+    # Only starts a live CROO connection when real CROO_SDK_KEY is set.
+
+  frontend:
+    image: nginx:alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    expose:
+      - '80'
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    depends_on:
+      - frontend
+    restart: unless-stopped

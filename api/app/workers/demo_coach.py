@@ -3,6 +3,7 @@ from typing import Optional
 
 from ..models import WorkerResults
 from ..config import settings
+from ..llm import complete
 
 
 DEFAULT_DEMO_SCRIPT = """# CAPScore Demo Script — 5 Minutes
@@ -40,27 +41,16 @@ DEFAULT_DEMO_SCRIPT = """# CAPScore Demo Script — 5 Minutes
 
 
 async def generate_demo_script(github_url: str, worker_results: WorkerResults) -> str:
-    if not settings.anthropic_api_key:
-        return DEFAULT_DEMO_SCRIPT
+    context_parts = []
+    if worker_results.repo:
+        context_parts.append(f"Repository score: {worker_results.repo.score:.0f}/100")
+        if worker_results.repo.issues:
+            context_parts.append(f"Issues: {'; '.join(worker_results.repo.issues[:3])}")
+    if worker_results.cap:
+        context_parts.append(f"CAP integration score: {worker_results.cap.score:.0f}/100")
+    context = "\n".join(context_parts) if context_parts else "No analysis results available."
 
-    try:
-        import anthropic
-        client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
-
-        context_parts = []
-        if worker_results.repo:
-            context_parts.append(f"Repository score: {worker_results.repo.score:.0f}/100")
-            if worker_results.repo.issues:
-                context_parts.append(f"Issues: {'; '.join(worker_results.repo.issues[:3])}")
-        if worker_results.cap:
-            context_parts.append(f"CAP integration score: {worker_results.cap.score:.0f}/100")
-        context = "\n".join(context_parts) if context_parts else "No analysis results available."
-
-        message = await client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=600,
-            temperature=0,
-            messages=[{"role": "user", "content": f"""Write a 5-minute demo script for CAPScore Agent (a CROO AI agent that audits other agents). The script should fit the CROO hackathon judging criteria: Technical Execution (30%), A2A Composability (25%), Innovation (20%), Adoption (15%), Presentation (10%).
+    prompt = f"""Write a 5-minute demo script for CAPScore Agent (a CROO AI agent that audits other agents). The script should fit the CROO hackathon judging criteria: Technical Execution (30%), A2A Composability (25%), Innovation (20%), Adoption (15%), Presentation (10%).
 
 Analysis context for the target agent:
 {context}
@@ -68,8 +58,7 @@ GitHub URL: {github_url}
 
 Write a concise, punchy demo script with timestamps (0:00, 0:30, 1:20, 2:20, 3:20, 4:20) showing: Agent Store listing -> CAP order -> A2A calls -> proof pack -> adoption metrics.
 
-Keep it under 400 words."""}],
-        )
-        return message.content[0].text
-    except Exception:
-        return DEFAULT_DEMO_SCRIPT
+Keep it under 400 words."""
+
+    text = await complete(prompt, max_tokens=600, temperature=0)
+    return text if text else DEFAULT_DEMO_SCRIPT
