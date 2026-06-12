@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAPScore Agent — CROO Hackathon 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --border-light: #21262d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
+      --accent: #6e40c9;
+      --accent-light: #8957e5;
+      --blue: #1f6feb;
+      --blue-light: #388bfd;
+      --green: #238636;
+      --green-light: #2ea043;
+      --green-text: #3fb950;
+      --orange: #d29922;
+      --orange-light: #e3b341;
+      --red: #da3633;
+      --red-light: #f85149;
+      --purple-glow: rgba(110, 64, 201, 0.15);
+      --radius: 6px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────────── */
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge-croo {
+      background: rgba(110, 64, 201, 0.2);
+      color: #b388ff;
+      border: 1px solid rgba(110, 64, 201, 0.4);
+    }
+
+    .badge-version {
+      background: var(--border-light);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Main layout ─────────────────────────────────────────────────────────── */
+
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    @media (max-width: 800px) {
+      .main { grid-template-columns: 1fr; padding: 16px; }
+    }
+
+    /* ── Cards ───────────────────────────────────────────────────────────────── */
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-header .icon { font-size: 16px; }
+    .card-body { padding: 18px; }
+
+    /* ── Tabs ────────────────────────────────────────────────────────────────── */
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 18px;
+      gap: 0;
+    }
+
+    .tab {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab:hover { color: var(--text); }
+
+    .tab.active {
+      color: #fff;
+      border-bottom-color: var(--accent-light);
+    }
+
+    .tab-panel { display: none; padding: 18px; }
+    .tab-panel.active { display: block; }
+
+    /* ── Forms ───────────────────────────────────────────────────────────────── */
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(110, 64, 201, 0.12);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .checkbox-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 0;
+    }
+
+    input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--accent-light);
+      cursor: pointer;
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    .btn-primary:hover { background: var(--accent-light); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface2);
+      border-color: var(--text-muted);
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green-light);
+    }
+
+    .btn-green:hover { background: var(--green-light); }
+
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-full { width: 100%; }
+
+    /* ── Spinner ─────────────────────────────────────────────────────────────── */
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* ── Status indicator ────────────────────────────────────────────────────── */
+
+    .job-status-bar {
+      margin: 14px 0;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-pending, .status-running {
+      background: rgba(31, 111, 235, 0.12);
+      border: 1px solid rgba(31, 111, 235, 0.3);
+      color: var(--blue-light);
+    }
+
+    .status-done {
+      background: rgba(35, 134, 54, 0.12);
+      border: 1px solid rgba(35, 134, 54, 0.35);
+      color: var(--green-text);
+    }
+
+    .status-failed {
+      background: rgba(218, 54, 51, 0.12);
+      border: 1px solid rgba(218, 54, 51, 0.35);
+      color: var(--red-light);
+    }
+
+    /* ── Scorecard ───────────────────────────────────────────────────────────── */
+
+    .scorecard {
+      margin-top: 6px;
+    }
+
+    .overall-score {
+      text-align: center;
+      padding: 20px 0 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .overall-number {
+      font-size: 52px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    .overall-number.high { color: var(--green-text); }
+    .overall-number.mid { color: var(--orange-light); }
+    .overall-number.low { color: var(--red-light); }
+
+    .overall-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .dimension-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dimension-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dimension-name {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dimension-name .weight {
+      font-size: 10px;
+      background: var(--border-light);
+      color: var(--text-dim);
+      padding: 1px 5px;
+      border-radius: 10px;
+    }
+
+    .dimension-score-num {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 42px;
+      text-align: right;
+    }
+
+    .dimension-bar-wrap {
+      grid-column: 1 / -1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .dimension-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .bar-high { background: linear-gradient(90deg, #238636, #3fb950); }
+    .bar-mid  { background: linear-gradient(90deg, #d29922, #e3b341); }
+    .bar-low  { background: linear-gradient(90deg, #da3633, #f85149); }
+
+    /* ── Issues & Fixes ──────────────────────────────────────────────────────── */
+
+    .issues-section {
+      margin-top: 16px;
+    }
+
+    .issues-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .issues-title.critical { color: var(--red-light); }
+    .issues-title.fixes { color: var(--green-text); }
+    .issues-title.notes { color: var(--blue-light); }
+
+    .issues-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .issues-list li {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 6px 10px;
+      background: var(--surface2);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--border);
+      line-height: 1.4;
+    }
+
+    .issues-list.critical li { border-left-color: var(--red-light); }
+    .issues-list.fixes li { border-left-color: var(--green-text); }
+
+    /* ── Hash display ────────────────────────────────────────────────────────── */
+
+    .hash-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hash-value {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      background: var(--border-light);
+    }
+
+    /* ── A2A calls ───────────────────────────────────────────────────────────── */
+
+    .a2a-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .a2a-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 7px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .a2a-agent {
+      font-family: monospace;
+      color: var(--blue-light);
+      flex: 1;
+    }
+
+    .a2a-status {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .a2a-status.cleared {
+      background: rgba(35, 134, 54, 0.15);
+      color: var(--green-text);
+      border: 1px solid rgba(35, 134, 54, 0.3);
+    }
+
+    .a2a-status.pending {
+      background: rgba(31, 111, 235, 0.15);
+      color: var(--blue-light);
+      border: 1px solid rgba(31, 111, 235, 0.3);
+    }
+
+    .a2a-status.failed {
+      background: rgba(218, 54, 51, 0.15);
+      color: var(--red-light);
+      border: 1px solid rgba(218, 54, 51, 0.3);
+    }
+
+    /* ── Leaderboard ─────────────────────────────────────────────────────────── */
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard-table th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .leaderboard-table td {
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .leaderboard-table tr:last-child td { border-bottom: none; }
+
+    .leaderboard-table tr:hover td { background: var(--surface2); }
+
+    .score-pill {
+      font-weight: 700;
+      font-size: 12px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .score-high { background: rgba(35, 134, 54, 0.15); color: var(--green-text); }
+    .score-mid  { background: rgba(210, 153, 34, 0.15); color: var(--orange-light); }
+    .score-low  { background: rgba(218, 54, 51, 0.15); color: var(--red-light); }
+    .score-na   { background: var(--border-light); color: var(--text-dim); }
+
+    .capability-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: rgba(110, 64, 201, 0.12);
+      color: #b388ff;
+      border-radius: 4px;
+      border: 1px solid rgba(110, 64, 201, 0.25);
+      font-family: monospace;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    .dot-done { background: var(--green-text); }
+    .dot-running { background: var(--blue-light); animation: pulse 1.5s ease-in-out infinite; }
+    .dot-pending { background: var(--orange-light); }
+    .dot-failed { background: var(--red-light); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .leaderboard-empty {
+      text-align: center;
+      padding: 28px 0;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    /* ── Result actions ──────────────────────────────────────────────────────── */
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Claim verification table ────────────────────────────────────────────── */
+
+    .claim-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    .claim-table th {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .claim-table td {
+      padding: 7px 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+
+    .claim-status {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .claim-supported { background: rgba(35,134,54,0.15); color: var(--green-text); }
+    .claim-weak { background: rgba(210,153,34,0.15); color: var(--orange-light); }
+    .claim-unsupported { background: rgba(218,54,51,0.15); color: var(--red-light); }
+    .claim-misleading { background: rgba(218,54,51,0.2); color: #ff7b72; }
+
+    /* ── Confidence bar ──────────────────────────────────────────────────────── */
+
+    .conf-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .conf-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .conf-fill {
+      height: 100%;
+      background: var(--blue-light);
+      border-radius: 2px;
+    }
+
+    .conf-num { font-size: 11px; color: var(--text-dim); min-width: 28px; text-align: right; }
+
+    /* ── Error state ─────────────────────────────────────────────────────────── */
+
+    .error-box {
+      padding: 12px 14px;
+      background: rgba(218, 54, 51, 0.08);
+      border: 1px solid rgba(218, 54, 51, 0.3);
+      border-radius: var(--radius);
+      color: var(--red-light);
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────────────────────── */
+
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .footer a {
+      color: var(--blue-light);
+      text-decoration: none;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+
+    /* ── Divider ─────────────────────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* ── Section label ───────────────────────────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    /* ── Tooltip copy flash ──────────────────────────────────────────────────── */
+    .copy-flash {
+      color: var(--green-text) !important;
+    }
+
+    /* ── Hidden ──────────────────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ── Notes expander ──────────────────────────────────────────────────────── */
+    .dim-notes {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      display: none;
+    }
+
+    .dimension-item:hover .dim-notes { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">C</div>
+        <div class="logo-text">
+          <h1>CAPScore Agent</h1>
+          <p>Verifiable Due Diligence for the Agent Economy</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-croo">CROO Hackathon 2026</span>
+        <span class="badge badge-version">v0.1.0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main ─────────────────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Left column: forms + results -->
+    <div>
+
+      <!-- Audit form card -->
+      <div class="card" id="audit-card">
+        <div class="tabs" id="tab-nav">
+          <div class="tab active" data-tab="repo">&#128202; Audit Repository</div>
+          <div class="tab" data-tab="agent">&#128272; Audit Agent Listing</div>
+          <div class="tab" data-tab="claims">&#10003; Verify Claims</div>
+        </div>
+
+        <!-- Tab: Audit Repository -->
+        <div class="tab-panel active" id="tab-repo">
+          <form id="form-repo" autocomplete="off">
+            <div class="form-group">
+              <label for="repo-url">GitHub Repository URL *</label>
+              <input type="url" id="repo-url" placeholder="https://github.com/owner/repo" required>
+            </div>
+            <div class="form-group">
+              <label for="repo-branch">Branch</label>
+              <input type="text" id="repo-branch" placeholder="main" value="main">
+            </div>
+            <div class="form-group">
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="repo-run-tests" checked>
+                  Run Tests
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="repo-security-scan" checked>
+                  Security Scan
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="btn-repo">
+              &#9654; Submit Audit
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab: Audit Agent Listing -->
+        <div class="tab-panel" id="tab-agent">
+          <form id="form-agent" autocomplete="off">
+            <div class="form-group">
+              <label for="agent-listing-url">Agent Store Listing URL *</label>
+              <input type="url" id="agent-listing-url" placeholder="https://agent.croo.network/my-agent" required>
+            </div>
+            <div class="form-group">
+              <label for="agent-github-url">GitHub URL (optional)</label>
+              <input type="url" id="agent-github-url" placeholder="https://github.com/team/repo">
+            </div>
+            <div class="form-group">
+              <label for="agent-demo-url">Demo Video URL (optional)</label>
+              <input type="url" id="agent-demo-url" placeholder="https://youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+              <label for="agent-tracks">Claimed Tracks (comma-separated)</label>
+              <input type="text" id="agent-tracks" placeholder="Data & Verification Agents, Developer Tooling Agents">
+              <div class="form-hint">e.g. Data &amp; Verification Agents, Developer Tooling Agents</div>
+            </div>
+            <div class="form-group">
+              <label for="agent-depth">Audit Depth</label>
+              <select id="agent-depth">
+                <option value="quick">Quick (~2 min)</option>
+                <option value="standard" selected>Standard (~5 min)</option>
+                <option value="deep">Deep (~10 min)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="btn-agent">
+              &#9654; Submit Audit
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab: Verify Claims -->
+        <div class="tab-panel" id="tab-claims">
+          <form id="form-claims" autocomplete="off">
+            <div class="form-group">
+              <label for="claims-text">Claims to Verify * (one per line)</label>
+              <textarea id="claims-text" rows="5" placeholder="This agent provides a working CAP provider.&#10;Docker Compose starts the stack with one command.&#10;The README setup works in under 10 minutes." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="claims-evidence">Evidence URLs (one per line, optional)</label>
+              <textarea id="claims-evidence" rows="2" placeholder="https://github.com/team/repo&#10;https://agent.croo.network/my-agent"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="claims-strictness">Strictness</label>
+              <select id="claims-strictness">
+                <option value="lenient">Lenient</option>
+                <option value="standard" selected>Standard</option>
+                <option value="strict">Strict</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="btn-claims">
+              &#10003; Verify Claims
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Job status + result card -->
+      <div class="card" id="result-card" style="margin-top: 20px; display: none;">
+        <div class="card-header">
+          <span class="icon">&#128196;</span>
+          <span id="result-title">Audit Result</span>
+          <span id="result-job-id" style="margin-left: auto; font-family: monospace; font-size: 11px; color: var(--text-dim);"></span>
+        </div>
+        <div class="card-body">
+
+          <!-- Status bar -->
+          <div id="job-status-bar" class="job-status-bar status-pending">
+            <span class="spinner" id="status-spinner"></span>
+            <span id="status-text">Initializing...</span>
+          </div>
+
+          <!-- Scorecard (hidden until done) -->
+          <div id="scorecard-section" class="scorecard hidden">
+
+            <!-- Overall score -->
+            <div class="overall-score">
+              <div class="overall-number" id="overall-score-num">—</div>
+              <div class="overall-label">Overall CAPScore / 100</div>
+            </div>
+
+            <!-- Dimension bars -->
+            <div class="dimension-list" id="dimension-list">
+              <!-- filled by JS -->
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Critical issues -->
+            <div class="issues-section" id="issues-section">
+              <!-- filled by JS -->
+            </div>
+
+            <!-- Hash + actions -->
+            <div id="hash-section" class="hidden">
+              <div class="section-label" style="margin-top:16px;">Proof</div>
+              <div class="hash-box">
+                <span id="hash-label" style="font-size:11px;color:var(--text-dim);flex-shrink:0;">sha256:</span>
+                <span class="hash-value" id="hash-value">—</span>
+                <button class="copy-btn" title="Copy hash" onclick="copyHash()">&#128203;</button>
+              </div>
+              <div class="result-actions">
+                <a id="proof-pack-link" href="#" class="btn btn-green btn-sm" target="_blank">
+                  &#8681; Download Proof Pack
+                </a>
+                <a id="result-md-link" href="#" class="btn btn-outline btn-sm" target="_blank">
+                  &#128196; result.md
+                </a>
+              </div>
+            </div>
+
+            <!-- A2A calls -->
+            <div id="a2a-section" class="hidden">
+              <div class="divider"></div>
+              <div class="section-label">A2A Calls Made During Audit</div>
+              <div class="a2a-list" id="a2a-list">
+                <!-- filled by JS -->
+              </div>
+            </div>
+
+            <!-- Claim verification table -->
+            <div id="claims-section" class="hidden">
+              <div class="divider"></div>
+              <div class="section-label">Claim Verification</div>
+              <div style="overflow-x:auto;">
+                <table class="claim-table" id="claim-table">
+                  <thead>
+                    <tr>
+                      <th>Claim</th>
+                      <th>Status</th>
+                      <th>Confidence</th>
+                    </tr>
+                  </thead>
+                  <tbody id="claim-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Error section -->
+          <div id="error-section" class="hidden">
+            <div class="error-box" id="error-message"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column: leaderboard -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">&#127942;</span>
+          Recent Audits
+          <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="loadLeaderboard()">&#8635; Refresh</button>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <table class="leaderboard-table" id="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Job</th>
+                <th>Score</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr>
+                <td colspan="3" class="leaderboard-empty">No audits yet — submit one above!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- How it works card -->
+      <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+          <span class="icon">&#9881;</span>
+          How It Works
+        </div>
+        <div class="card-body" style="font-size: 13px; color: var(--text-muted); line-height: 1.7;">
+          <ol style="padding-left: 18px; display: flex; flex-direction: column; gap: 8px;">
+            <li>Submit a GitHub URL, agent listing, or claims list.</li>
+            <li>CAPScore runs 4–6 AI workers in parallel: repo reproducer, CAP inspector, claim verifier, security scanner.</li>
+            <li>The scoring engine applies CROO hackathon weights (30% tech, 25% A2A, 20% innovation, 15% adoption, 10% presentation).</li>
+            <li>A tamper-evident <strong style="color:var(--text);">proof pack</strong> is built: canonical JSON + SHA-256 hash chain.</li>
+            <li>Download the ZIP and verify the hash independently.</li>
+          </ol>
+          <div class="divider"></div>
+          <div style="font-size:12px; color: var(--text-dim);">
+            CAPScore is itself a CAP provider — any CROO agent can call it programmatically via the Agent Store.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>CAPScore Agent v0.1.0 &mdash; Built for
+      <a href="https://dorahacks.io/hackathon/croo-hackathon" target="_blank">CROO Hackathon 2026</a>
+    </span>
+    &nbsp;&middot;&nbsp;
+    <span>
+      <a href="https://github.com/CROO-Network/capscore-agent" target="_blank">GitHub</a>
+    </span>
+    &nbsp;&middot;&nbsp;
+    <span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </span>
+  </footer>
+
+  <script>
+    'use strict';
+
+    const API = 'http://localhost:8000';
+
+    // ── Tab switching ──────────────────────────────────────────────────────────
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const target = 'tab-' + tab.dataset.tab;
+        document.getElementById(target).classList.add('active');
+      });
+    });
+
+    // ── Form submit handlers ───────────────────────────────────────────────────
+
+    document.getElementById('form-repo').addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = {
+        github_url: document.getElementById('repo-url').value.trim(),
+        branch: document.getElementById('repo-branch').value.trim() || 'main',
+        run_tests: document.getElementById('repo-run-tests').checked,
+        run_security_scan: document.getElementById('repo-security-scan').checked,
+      };
+      await submitJob('/jobs/audit-repository', body, 'btn-repo', 'Audit Repository');
+    });
+
+    document.getElementById('form-agent').addEventListener('submit', async e => {
+      e.preventDefault();
+      const tracksRaw = document.getElementById('agent-tracks').value.trim();
+      const body = {
+        agent_listing_url: document.getElementById('agent-listing-url').value.trim(),
+        github_url: document.getElementById('agent-github-url').value.trim() || undefined,
+        demo_url: document.getElementById('agent-demo-url').value.trim() || undefined,
+        claimed_tracks: tracksRaw ? tracksRaw.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        depth: document.getElementById('agent-depth').value,
+      };
+      // Remove undefined keys
+      Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+      await submitJob('/jobs/audit-agent', body, 'btn-agent', 'Agent Listing Audit');
+    });
+
+    document.getElementById('form-claims').addEventListener('submit', async e => {
+      e.preventDefault();
+      const claimsRaw = document.getElementById('claims-text').value.trim();
+      const evidenceRaw = document.getElementById('claims-evidence').value.trim();
+      const body = {
+        claims: claimsRaw.split('\n').map(s => s.trim()).filter(Boolean),
+        evidence_urls: evidenceRaw ? evidenceRaw.split('\n').map(s => s.trim()).filter(Boolean) : undefined,
+        strictness: document.getElementById('claims-strictness').value,
+      };
+      if (!body.evidence_urls || body.evidence_urls.length === 0) delete body.evidence_urls;
+      await submitJob('/jobs/verify-claims', body, 'btn-claims', 'Claim Verification');
+    });
+
+    // ── Core job submission + polling ──────────────────────────────────────────
+
+    async function submitJob(endpoint, body, btnId, title) {
+      const btn = document.getElementById(btnId);
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+      hideErrorSection();
+      showResultCard(title, '');
+
+      try {
+        const resp = await fetch(API + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+          throw new Error(err.detail || resp.statusText);
+        }
+
+        const job = await resp.json();
+        setJobId(job.job_id);
+        setStatus(job.status, 'Job created — running workers...');
+
+        btn.innerHTML = '<span class="spinner"></span> Running...';
+        await pollJob(job.job_id);
+
+      } catch (err) {
+        showError('Failed to submit: ' + err.message);
+        setStatus('failed', 'Submission failed');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    async function pollJob(jobId) {
+      const INTERVAL = 2000;
+      const MAX_ATTEMPTS = 180; // 6 min max
+
+      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        await sleep(INTERVAL);
+
+        try {
+          const resp = await fetch(`${API}/jobs/${jobId}`);
+          if (!resp.ok) {
+            if (resp.status === 404) throw new Error('Job not found');
+            continue; // transient error, keep polling
+          }
+
+          const job = await resp.json();
+          const status = job.status;
+
+          if (status === 'running') {
+            setStatus('running', 'Workers running...');
+          } else if (status === 'pending') {
+            setStatus('pending', 'Job queued...');
+          } else if (status === 'done') {
+            setStatus('done', 'Audit complete');
+            renderResult(job);
+            loadLeaderboard();
+            return;
+          } else if (status === 'failed') {
+            setStatus('failed', 'Job failed');
+            showError(job.error || 'Job failed with no error message.');
+            loadLeaderboard();
+            return;
+          }
+        } catch (err) {
+          // Network error — keep polling
+          setStatus('running', 'Waiting for result...');
+        }
+      }
+
+      setStatus('failed', 'Timed out waiting for result');
+      showError('Job did not complete within 6 minutes. Check the API or refresh.');
+    }
+
+    // ── Result rendering ───────────────────────────────────────────────────────
+
+    function renderResult(job) {
+      const sc = job.scorecard;
+      if (!sc) {
+        showError('Job completed but no scorecard was returned.');
+        return;
+      }
+
+      // Overall score
+      const overall = sc.overall_score || 0;
+      const numEl = document.getElementById('overall-score-num');
+      numEl.textContent = overall.toFixed(1);
+      numEl.className = 'overall-number ' + scoreClass(overall);
+
+      // Dimensions
+      const dims = [
+        { key: 'technical_execution', label: 'Technical Execution', weight: '30%' },
+        { key: 'a2a_composability',   label: 'A2A Composability',   weight: '25%' },
+        { key: 'innovation',          label: 'Innovation',          weight: '20%' },
+        { key: 'adoption_readiness',  label: 'Adoption Readiness',  weight: '15%' },
+        { key: 'presentation_readiness', label: 'Presentation',     weight: '10%' },
+      ];
+
+      const dimList = document.getElementById('dimension-list');
+      dimList.innerHTML = '';
+      dims.forEach(d => {
+        const dim = sc[d.key] || { score: 0, notes: '' };
+        const s = dim.score || 0;
+        const cls = s >= 70 ? 'bar-high' : s >= 40 ? 'bar-mid' : 'bar-low';
+        const numCls = s >= 70 ? 'high' : s >= 40 ? 'mid' : 'low';
+        const colorStyle = s >= 70 ? 'var(--green-text)' : s >= 40 ? 'var(--orange-light)' : 'var(--red-light)';
+        dimList.innerHTML += `
+          <div class="dimension-item">
+            <div class="dimension-name">
+              ${escHtml(d.label)}
+              <span class="weight">${d.weight}</span>
+            </div>
+            <div class="dimension-score-num" style="color:${colorStyle}">${s.toFixed(0)}<span style="font-size:10px;color:var(--text-dim)">/100</span></div>
+            <div class="dimension-bar-wrap">
+              <div class="dimension-bar ${cls}" style="width:${Math.min(s,100)}%"></div>
+            </div>
+            ${dim.notes ? `<div class="dim-notes">${escHtml(dim.notes)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      // Issues & fixes
+      const issuesSec = document.getElementById('issues-section');
+      issuesSec.innerHTML = '';
+
+      if (sc.critical_issues && sc.critical_issues.length > 0) {
+        issuesSec.innerHTML += `
+          <div class="issues-title critical">&#9888; Critical Issues</div>
+          <ul class="issues-list critical">
+            ${sc.critical_issues.map(i => `<li>${escHtml(i)}</li>`).join('')}
+          </ul>
+        `;
+      }
+
+      if (sc.top_fixes && sc.top_fixes.length > 0) {
+        issuesSec.innerHTML += `
+          <div class="issues-title fixes" style="margin-top:12px;">&#10003; Top Fixes</div>
+          <ul class="issues-list fixes">
+            ${sc.top_fixes.map(f => `<li>${escHtml(f)}</li>`).join('')}
+          </ul>
+        `;
+      }
+
+      // Hash + proof pack
+      if (job.result_hash) {
+        document.getElementById('hash-value').textContent = job.result_hash;
+        const ppLink = document.getElementById('proof-pack-link');
+        const mdLink = document.getElementById('result-md-link');
+        ppLink.href = `${API}/jobs/${job.job_id}/proof-pack.zip`;
+        mdLink.href = `${API}/jobs/${job.job_id}/result.md`;
+        document.getElementById('hash-section').classList.remove('hidden');
+      }
+
+      // A2A calls
+      if (job.a2a_calls && job.a2a_calls.length > 0) {
+        const a2aList = document.getElementById('a2a-list');
+        a2aList.innerHTML = job.a2a_calls.map(c => `
+          <div class="a2a-item">
+            <span style="font-size:11px;color:var(--text-dim);flex-shrink:0;">${escHtml(c.task || '')}</span>
+            <span class="a2a-agent">${escHtml(c.provider_agent || '')}</span>
+            <span class="a2a-status ${c.status === 'cleared' ? 'cleared' : c.status === 'failed' ? 'failed' : 'pending'}">${escHtml(c.status || 'pending')}</span>
+          </div>
+        `).join('');
+        document.getElementById('a2a-section').classList.remove('hidden');
+      }
+
+      // Claim verification table
+      const wr = job.worker_results;
+      if (wr && wr.claims && wr.claims.verifications && wr.claims.verifications.length > 0) {
+        const tbody = document.getElementById('claim-tbody');
+        tbody.innerHTML = wr.claims.verifications.map(v => {
+          const conf = Math.round((v.confidence || 0) * 100);
+          const statusCls = {
+            supported: 'claim-supported',
+            weak: 'claim-weak',
+            unsupported: 'claim-unsupported',
+            misleading: 'claim-misleading',
+          }[v.status] || 'claim-weak';
+          return `
+            <tr>
+              <td style="max-width:220px;">${escHtml(v.claim)}</td>
+              <td><span class="claim-status ${statusCls}">${escHtml(v.status)}</span></td>
+              <td>
+                <div class="conf-bar">
+                  <div class="conf-track"><div class="conf-fill" style="width:${conf}%"></div></div>
+                  <span class="conf-num">${conf}%</span>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+        document.getElementById('claims-section').classList.remove('hidden');
+      }
+
+      document.getElementById('scorecard-section').classList.remove('hidden');
+    }
+
+    // ── UI helpers ─────────────────────────────────────────────────────────────
+
+    function showResultCard(title, jobId) {
+      const card = document.getElementById('result-card');
+      card.style.display = 'block';
+      document.getElementById('result-title').textContent = title;
+      setJobId(jobId);
+      document.getElementById('scorecard-section').classList.add('hidden');
+      document.getElementById('error-section').classList.add('hidden');
+      document.getElementById('a2a-section').classList.add('hidden');
+      document.getElementById('claims-section').classList.add('hidden');
+      document.getElementById('hash-section').classList.add('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setJobId(jobId) {
+      document.getElementById('result-job-id').textContent = jobId || '';
+    }
+
+    function setStatus(status, text) {
+      const bar = document.getElementById('job-status-bar');
+      const spinner = document.getElementById('status-spinner');
+      const textEl = document.getElementById('status-text');
+      bar.className = 'job-status-bar status-' + status;
+      textEl.textContent = text;
+      spinner.style.display = (status === 'running' || status === 'pending') ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      const sec = document.getElementById('error-section');
+      document.getElementById('error-message').textContent = msg;
+      sec.classList.remove('hidden');
+    }
+
+    function hideErrorSection() {
+      document.getElementById('error-section').classList.add('hidden');
+    }
+
+    function scoreClass(s) {
+      return s >= 70 ? 'high' : s >= 40 ? 'mid' : 'low';
+    }
+
+    function scoreColor(s) {
+      return s >= 70 ? 'score-high' : s >= 40 ? 'score-mid' : s >= 0 ? 'score-low' : 'score-na';
+    }
+
+    function escHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ── Copy hash ──────────────────────────────────────────────────────────────
+
+    function copyHash() {
+      const hash = document.getElementById('hash-value').textContent;
+      navigator.clipboard.writeText(hash).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.classList.add('copy-flash');
+        btn.textContent = '✓';
+        setTimeout(() => {
+          btn.classList.remove('copy-flash');
+          btn.textContent = '📋';
+        }, 1500);
+      }).catch(() => {
+        // fallback for non-HTTPS
+        const ta = document.createElement('textarea');
+        ta.value = hash;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      });
+    }
+
+    // ── Leaderboard ────────────────────────────────────────────────────────────
+
+    async function loadLeaderboard() {
+      try {
+        const resp = await fetch(`${API}/jobs`);
+        if (!resp.ok) return;
+        const jobs = await resp.json();
+        renderLeaderboard(jobs);
+      } catch (e) {
+        // API not reachable — silently fail
+      }
+    }
+
+    function renderLeaderboard(jobs) {
+      const tbody = document.getElementById('leaderboard-body');
+      if (!jobs || jobs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">No audits yet — submit one above!</td></tr>';
+        return;
+      }
+
+      const capShort = {
+        'audit_repository': 'repo',
+        'audit_agent_listing': 'agent',
+        'verify_claims': 'claims',
+      };
+
+      tbody.innerHTML = jobs.slice(0, 20).map(j => {
+        const score = j.overall_score;
+        const hasScore = score !== null && score !== undefined;
+        const scorePill = hasScore
+          ? `<span class="score-pill ${scoreColor(score)}">${Number(score).toFixed(0)}</span>`
+          : `<span class="score-pill score-na">—</span>`;
+
+        const dotClass = {
+          done: 'dot-done',
+          running: 'dot-running',
+          pending: 'dot-pending',
+          failed: 'dot-failed',
+        }[j.status] || 'dot-pending';
+
+        const cap = capShort[j.capability] || j.capability;
+        const shortId = j.job_id ? j.job_id.slice(-12) : '—';
+
+        return `
+          <tr style="cursor:pointer;" onclick="loadJobResult('${escHtml(j.job_id)}')">
+            <td>
+              <div><span class="capability-tag">${escHtml(cap)}</span></div>
+              <div style="font-family:monospace;font-size:10px;color:var(--text-dim);margin-top:3px;">${escHtml(shortId)}</div>
+            </td>
+            <td>${scorePill}</td>
+            <td>
+              <span class="status-dot ${dotClass}"></span>
+              ${escHtml(j.status)}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadJobResult(jobId) {
+      showResultCard('Audit Result', jobId);
+      setStatus('running', 'Loading result...');
+
+      try {
+        const resp = await fetch(`${API}/jobs/${jobId}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const job = await resp.json();
+        setStatus(job.status, job.status === 'done' ? 'Audit complete' : job.status === 'failed' ? 'Job failed' : 'In progress...');
+        if (job.status === 'done' && job.scorecard) {
+          renderResult(job);
+        } else if (job.status === 'failed') {
+          showError(job.error || 'Job failed.');
+        } else {
+          // Still running — start polling
+          await pollJob(jobId);
+        }
+      } catch (err) {
+        showError('Could not load job: ' + err.message);
+        setStatus('failed', 'Load failed');
+      }
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+
+    loadLeaderboard();
+    // Refresh leaderboard every 30s
+    setInterval(loadLeaderboard, 30000);
+  </script>
+</body>
+</html>

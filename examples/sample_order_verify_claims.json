@@ -1,0 +1,14 @@
+{
+  "claims": [
+    "This agent provides a working CAP provider.",
+    "The agent can be called by other agents via CROO SDK.",
+    "The README setup works in less than 10 minutes.",
+    "The agent delivers verifiable proof packs with SHA-256 hashes.",
+    "Docker Compose starts the entire stack with one command."
+  ],
+  "evidence_urls": [
+    "https://github.com/example-team/my-croo-agent",
+    "https://agent.croo.network/example-agent"
+  ],
+  "strictness": "standard"
+}

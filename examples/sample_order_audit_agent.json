@@ -1,0 +1,10 @@
+{
+  "agent_listing_url": "https://agent.croo.network/example-agent",
+  "github_url": "https://github.com/example-team/my-croo-agent",
+  "demo_url": "https://youtube.com/watch?v=example",
+  "claimed_tracks": [
+    "Data & Verification Agents",
+    "Developer Tooling Agents"
+  ],
+  "depth": "standard"
+}

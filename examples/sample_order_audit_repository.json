@@ -1,0 +1,6 @@
+{
+  "github_url": "https://github.com/CROO-Network/capscore-agent",
+  "branch": "main",
+  "run_tests": true,
+  "run_security_scan": true
+}

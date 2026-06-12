@@ -1,0 +1,36 @@
+# CAPScore Report — {{ job_id }}
+
+**Overall Score: {{ overall_score | round(0) | int }}/100**
+Generated: {{ generated_at }}
+
+## Judging-Aligned Scorecard
+
+| Dimension | Score | Weight | Notes |
+|---|---:|---:|---|
+| Technical Execution | {{ tech_score | round(0) | int }}/100 | 30% | {{ tech_notes }} |
+| A2A Composability | {{ a2a_score | round(0) | int }}/100 | 25% | {{ a2a_notes }} |
+| Innovation | {{ innov_score | round(0) | int }}/100 | 20% | {{ innov_notes }} |
+| Adoption Readiness | {{ adopt_score | round(0) | int }}/100 | 15% | {{ adopt_notes }} |
+| Presentation | {{ pres_score | round(0) | int }}/100 | 10% | {{ pres_notes }} |
+
+{% if critical_issues %}
+## Critical Issues
+{% for issue in critical_issues %}
+{{ loop.index }}. {{ issue }}
+{% endfor %}
+{% endif %}
+
+{% if top_fixes %}
+## Top Fixes Before Demo Day
+{% for fix in top_fixes %}
+{{ loop.index }}. {{ fix }}
+{% endfor %}
+{% endif %}
+
+## Proof
+- Result hash: `{{ result_hash }}`
+- Proof pack: `proof-pack-{{ job_id }}.zip`
+- A2A calls: {{ a2a_calls_count }}
+
+---
+*CAPScore Agent v0.1.0 — CROO Hackathon 2026*

@@ -1,0 +1,212 @@
+{
+  "job_id": "capscore_20260612_100000_abc12345",
+  "status": "done",
+  "capability": "audit_repository",
+  "created_at": "2026-06-12T10:00:00Z",
+  "started_at": "2026-06-12T10:00:02Z",
+  "completed_at": "2026-06-12T10:04:30Z",
+  "scorecard": {
+    "overall_score": 84.0,
+    "technical_execution": {
+      "score": 85.7,
+      "notes": "12/14 checks passed. Repository setup is reproducible; CI pipeline present.",
+      "checks": [
+        {"name": "github_url_provided", "passed": true, "note": "Input URL provided"},
+        {"name": "readme_exists", "passed": true, "note": "README.md present"},
+        {"name": "env_example_exists", "passed": true, "note": ".env.example present"},
+        {"name": "docker_compose_exists", "passed": true, "note": "docker-compose.yml present"},
+        {"name": "dockerfile_exists", "passed": true, "note": "Dockerfile present"},
+        {"name": "tests_exist", "passed": true, "note": "tests/ directory present"},
+        {"name": "ci_exists", "passed": true, "note": "CI workflow present"},
+        {"name": "reproducible", "passed": true, "note": "Repo setup reproducible (score=85)"},
+        {"name": "cap_schema_present", "passed": true, "note": "CAP capability schema present"},
+        {"name": "cap_pricing_defined", "passed": true, "note": "CAP pricing defined"},
+        {"name": "cap_proof_delivery", "passed": true, "note": "Proof-of-delivery fields present"},
+        {"name": "cap_output_machine_readable", "passed": true, "note": "Output is machine-readable JSON"},
+        {"name": "no_critical_secrets", "passed": true, "note": "Security risk level: low"},
+        {"name": "license_exists", "passed": false, "note": "LICENSE file missing or not detected"}
+      ]
+    },
+    "a2a_composability": {
+      "score": 85.7,
+      "notes": "6/7 A2A composability checks passed.",
+      "checks": [
+        {"name": "callable_by_agents", "passed": true, "note": "Service can be called by another agent"},
+        {"name": "typed_inputs", "passed": true, "note": "Inputs are typed/minimal"},
+        {"name": "structured_output", "passed": true, "note": "Outputs are structured JSON"},
+        {"name": "pricing_explicit", "passed": true, "note": "Pricing and SLA explicit"},
+        {"name": "a2a_dependency_documented", "passed": true, "note": "A2A dependency documented"},
+        {"name": "makes_a2a_calls", "passed": true, "note": "Makes A2A calls to other agents (3 calls)"},
+        {"name": "failure_behavior_documented", "passed": false, "note": "Failure/timeout behavior not documented"}
+      ]
+    },
+    "innovation": {
+      "score": 80.0,
+      "notes": "4/5 innovation checks passed.",
+      "checks": [
+        {"name": "cap_integrated", "passed": true, "note": "CAP integration is real (not superficial)"},
+        {"name": "unique_use_case", "passed": true, "note": "Use case is distinct from generic API marketplace"},
+        {"name": "evidence_provided", "passed": true, "note": "Evidence URLs provided"},
+        {"name": "claims_backed_by_evidence", "passed": true, "note": "4 claims backed by evidence"},
+        {"name": "machine_readable_output", "passed": false, "note": "Output reusable by other agents — partially implemented"}
+      ]
+    },
+    "adoption_readiness": {
+      "score": 83.3,
+      "notes": "5/6 adoption readiness checks passed.",
+      "checks": [
+        {"name": "listing_url_present", "passed": false, "note": "Agent Store listing URL not provided"},
+        {"name": "github_url_present", "passed": true, "note": "GitHub URL present"},
+        {"name": "quickstart_exists", "passed": true, "note": "README with quickstart present"},
+        {"name": "env_documented", "passed": true, "note": ".env.example with documented variables"},
+        {"name": "clear_pricing", "passed": true, "note": "Clear pricing for buyers"},
+        {"name": "sla_defined", "passed": true, "note": "SLA defined"}
+      ]
+    },
+    "presentation_readiness": {
+      "score": 80.0,
+      "notes": "4/5 presentation readiness checks passed.",
+      "checks": [
+        {"name": "readme_present", "passed": true, "note": "README present"},
+        {"name": "demo_url_provided", "passed": false, "note": "No demo video URL provided"},
+        {"name": "claims_present", "passed": true, "note": "Claims or listing provided"},
+        {"name": "no_misleading_claims", "passed": true, "note": "0 misleading claims found"},
+        {"name": "few_unsupported_claims", "passed": true, "note": "0 unsupported claims"}
+      ]
+    },
+    "critical_issues": [
+      "No Agent Store listing URL provided — required for hackathon submission",
+      "Failure/timeout behavior not documented in CAP integration",
+      "LICENSE file not detected in repository root"
+    ],
+    "top_fixes": [
+      "Register agent on agent.croo.network and add listing URL to submission",
+      "Add failure_modes section to cap-provider/src/schemas.ts",
+      "Add MIT LICENSE file to repository root",
+      "Add demo video URL (YouTube or Loom) to README and submission",
+      "Document SLA timeouts in README and CAP schema"
+    ]
+  },
+  "worker_results": {
+    "repo": {
+      "stack_detected": "typescript+python",
+      "files_present": {
+        "README.md": true,
+        ".env.example": true,
+        "docker-compose.yml": true,
+        "Dockerfile": true,
+        "tests/": true,
+        ".github/workflows/": true,
+        "LICENSE": true,
+        "cap-provider/": true,
+        "api/": true,
+        "frontend/": true
+      },
+      "reproducible": true,
+      "score": 85.0,
+      "issues": [
+        "No Agent Store listing URL provided — required for hackathon submission"
+      ],
+      "suggestions": [
+        "Register agent on agent.croo.network and add listing URL to submission",
+        "Add MIT LICENSE file to repository root",
+        "Add demo video URL (YouTube or Loom) to README and submission"
+      ]
+    },
+    "claims": {
+      "verifications": [
+        {
+          "claim": "This agent provides a working CAP provider.",
+          "status": "supported",
+          "evidence": "cap-provider/src/index.ts registers capabilities via CROO SDK; package.json lists @croo/agent-sdk dependency",
+          "confidence": 0.92,
+          "suggested_rewrite": ""
+        },
+        {
+          "claim": "The agent can be called by other agents via CROO SDK.",
+          "status": "supported",
+          "evidence": "registerCapabilities.ts exports three capabilities with typed input/output schemas",
+          "confidence": 0.88,
+          "suggested_rewrite": ""
+        },
+        {
+          "claim": "The README setup works in less than 10 minutes.",
+          "status": "weak",
+          "evidence": "README has 5-step quickstart but first-time Docker pull could exceed 10 minutes on slow connections",
+          "confidence": 0.65,
+          "suggested_rewrite": "The README setup typically works in under 15 minutes with Docker installed."
+        },
+        {
+          "claim": "The agent delivers verifiable proof packs with SHA-256 hashes.",
+          "status": "supported",
+          "evidence": "proof_pack.py builds deterministic ZIP with sha256 manifest; result_hash.sha256 in every pack",
+          "confidence": 0.95,
+          "suggested_rewrite": ""
+        }
+      ],
+      "score": 85.0
+    },
+    "cap": {
+      "checks": {
+        "schema_present": true,
+        "pricing_defined": true,
+        "proof_delivery": true,
+        "output_machine_readable": true,
+        "callable_by_agents": true,
+        "typed_inputs": true,
+        "a2a_dependency": true,
+        "failure_documented": false,
+        "sla_defined": true,
+        "wallet_setup": true
+      },
+      "score": 90.0,
+      "issues": [
+        "failure_documented check failed — add failure_modes to schema"
+      ]
+    },
+    "security": {
+      "findings": [],
+      "dangerous_patterns": [],
+      "unpinned_deps": ["httpx", "anthropic"],
+      "risk_level": "low",
+      "score": 95.0
+    },
+    "readme_suggestions": [
+      "Add a one-line badge for the CROO Agent Store listing",
+      "Add architecture diagram showing CAP order flow",
+      "Add troubleshooting section for Docker networking issues"
+    ]
+  },
+  "result_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "proof_pack_url": "http://localhost:8000/jobs/capscore_20260612_100000_abc12345/proof-pack.zip",
+  "a2a_calls": [
+    {
+      "provider_agent": "source-verifier-mock",
+      "cap_order_id": "order_sv_001",
+      "task": "verify_github_source",
+      "result_hash": "sha256:abc123def456",
+      "status": "cleared",
+      "started_at": "2026-06-12T10:00:05Z",
+      "completed_at": "2026-06-12T10:00:12Z"
+    },
+    {
+      "provider_agent": "security-scanner-mock",
+      "cap_order_id": "order_sec_001",
+      "task": "scan_secrets",
+      "result_hash": "sha256:bcd234ef5678",
+      "status": "cleared",
+      "started_at": "2026-06-12T10:01:00Z",
+      "completed_at": "2026-06-12T10:02:30Z"
+    },
+    {
+      "provider_agent": "readme-rewriter-mock",
+      "cap_order_id": "order_rr_001",
+      "task": "suggest_readme_improvements",
+      "result_hash": "sha256:cde345f06789",
+      "status": "cleared",
+      "started_at": "2026-06-12T10:03:00Z",
+      "completed_at": "2026-06-12T10:04:00Z"
+    }
+  ],
+  "error": null
+}
