@@ -1,4 +1,42 @@
-# Deploying CAPScore to croo.maaihub.com
+# Deploying CAPScore
+
+## Recommended: free single-container hosts
+
+The whole app runs as **one container** — FastAPI serves both the dashboard and
+the REST API (`frontend` is same-origin, no nginx needed). The root `Dockerfile`
+is all any free Docker host needs; it reads `$PORT` automatically.
+
+The optional Node `cap-provider` (live CROO WebSocket listener) is **not** part of
+the single container and is only needed once real CROO credentials exist.
+
+| Host | Free? | URL | Notes |
+|---|---|---|---|
+| **Render** | Yes (free web service) | `*.onrender.com` | Easiest. `render.yaml` included. Cold start ~50s after idle. |
+| **Hugging Face Spaces** | Yes (no card) | `*.hf.space` | Docker Space. Use `deploy/huggingface-space-README.md`. Great for AI demos. |
+| **Google Cloud Run** | Yes (free tier) | `*.run.app` | Scales to zero, fast. Needs gcloud + a billing-enabled project. |
+| **Koyeb** | Yes (free instance) | `*.koyeb.app` | Docker-native. |
+
+### Render (quickest)
+
+1. Push this repo to GitHub (also required for the hackathon submission).
+2. Render → **New → Blueprint** → pick the repo (it reads `render.yaml`).
+3. Set secrets `ANTHROPIC_API_KEY` and/or `OPENAI_API_KEY`.
+4. Deploy → live at `https://capscore-agent.onrender.com`.
+5. Set `CAPSCORE_PUBLIC_BASE_URL` to that URL and redeploy.
+
+### Local single-container test
+
+```bash
+docker build -t capscore .
+docker run --rm -p 8000:8000 --env-file .env capscore
+# open http://localhost:8000
+```
+
+---
+
+## Self-hosting behind a custom domain (Cloudflare Tunnel)
+
+> Original notes for serving under a custom domain via a Cloudflare Tunnel.
 
 The stack runs three containers (`api`, `frontend`, `cloudflared`) and is fronted
 by a **Cloudflare Tunnel**, so no inbound ports need to be opened on the host.

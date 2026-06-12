@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     allow_network_repro: bool = False
     log_level: str = "info"
     runs_dir: Path = Path("/app/runs")
+    frontend_dir: Path = Path("/app/frontend")
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

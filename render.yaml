@@ -1,0 +1,28 @@
+# Render Blueprint — free single-container deploy of CAPScore.
+# Render builds the root Dockerfile and injects $PORT (handled by the CMD).
+# Connect this repo at https://render.com (New > Blueprint) or use the Render API.
+services:
+  - type: web
+    name: capscore-agent
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false        # set in Render dashboard / API (secret)
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-6
+      - key: OPENAI_API_KEY
+        sync: false        # set in Render dashboard / API (secret)
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: MAX_JOB_SECONDS
+        value: "300"
+      - key: MAX_REPO_MB
+        value: "250"
+      - key: ALLOW_NETWORK_REPRO
+        value: "false"
+      # CAPSCORE_PUBLIC_BASE_URL is set after the first deploy to the
+      # assigned https://capscore-agent.onrender.com URL.

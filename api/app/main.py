@@ -143,3 +143,25 @@ async def list_jobs():
          "created_at": j.created_at.isoformat()}
         for j in sorted(_jobs.values(), key=lambda x: x.created_at, reverse=True)
     ]
+
+
+# ── Static dashboard (single-container deploy) ───────────────────────────────────
+# Serve the frontend from FastAPI so the whole app runs as ONE container on any
+# free host. API routes above are registered first and take precedence; this
+# catch-all mount handles "/" and static assets. The frontend already calls the
+# API same-origin, so no separate proxy/nginx is needed.
+def _resolve_frontend_dir() -> Path | None:
+    candidates = [
+        settings.frontend_dir,
+        Path(__file__).resolve().parent.parent.parent / "frontend",
+    ]
+    for c in candidates:
+        if c.is_dir() and (c / "index.html").exists():
+            return c
+    return None
+
+
+_frontend = _resolve_frontend_dir()
+if _frontend is not None:
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=str(_frontend), html=True), name="frontend")
