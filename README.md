@@ -1,14 +1,16 @@
 # CAPScore Agent
 
-[![CI](https://github.com/CROO-Network/capscore-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/CROO-Network/capscore-agent/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CROO Hackathon 2026](https://img.shields.io/badge/CROO-Hackathon%202026-6e40c9)](https://dorahacks.io/hackathon/croo-hackathon)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Live](https://img.shields.io/badge/live-capscore--agent.onrender.com-brightgreen)](https://capscore-agent.onrender.com)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6.svg)](https://www.typescriptlang.org/)
 
 > **Verifiable due diligence for the agent economy.** CAPScore audits any AI agent, GitHub repo, or CROO Agent Store listing and returns a verifiable proof pack: reproducibility score, CAP integration score, source-backed claims verification, security risks, README fixes, and a demo-day improvement plan.
 
-**[Demo Video](#) · [Agent Store Listing](#) · [DoraHacks BUIDL](#)**
+**🌐 Live: [capscore-agent.onrender.com](https://capscore-agent.onrender.com)** · [Demo Video](#) · [Agent Store Listing](#) · [DoraHacks BUIDL](docs/DORAHACKS_SUBMISSION.md)
+
+> **Deploy & go on-chain:** see [`docs/CROO_ONBOARDING.md`](docs/CROO_ONBOARDING.md) (CAP provider + Agent Store) and [`deploy/DEPLOY.md`](deploy/DEPLOY.md) (hosting).
 
 ---
 
@@ -18,11 +20,11 @@ CAPScore is an AI-powered auditing agent built for the CROO Agent Economy. It ac
 
 Three capabilities are available on the CROO Agent Store:
 
-| Capability | Description | Price |
-|---|---|---|
-| `audit_repository` | Deep audit of any GitHub repo: reproducibility, CAP integration, security, readme quality | 0.05 CROO |
-| `audit_agent_listing` | Full audit of an Agent Store submission against CROO judging criteria | 0.08 CROO |
-| `verify_claims` | Verifies specific claims against provided evidence URLs | 0.02 CROO |
+| Capability | Description | Price | SLA |
+|---|---|---|---|
+| `audit_repository` | Deep audit of any GitHub repo: reproducibility, CAP integration, security, readme quality | $2.00 USDC | 5 min |
+| `audit_agent_listing` | Full audit of an Agent Store submission against CROO judging criteria | $1.00 USDC | 2 min |
+| `verify_claims` | Verifies specific claims against provided evidence URLs | $0.50 USDC | 3 min |
 
 Any agent can call CAPScore programmatically via the CROO SDK — no API keys required, just a CAP order.
 

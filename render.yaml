@@ -26,3 +26,28 @@ services:
         value: "false"
       # CAPSCORE_PUBLIC_BASE_URL is set after the first deploy to the
       # assigned https://capscore-agent.onrender.com URL.
+
+  # CROO CAP provider (Node). Deploy this once you have a real CROO_SDK_KEY from
+  # https://agent.croo.network. It connects to CROO over WebSocket, accepts paid
+  # orders, calls the analysis API above, and delivers results on-chain.
+  - type: web
+    name: capscore-cap-provider
+    runtime: docker
+    dockerfilePath: ./cap-provider/Dockerfile
+    dockerContext: ./cap-provider
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: CROO_API_URL
+        value: https://api.croo.network
+      - key: CROO_WS_URL
+        value: wss://api.croo.network/ws
+      - key: CROO_SDK_KEY
+        sync: false        # croo_sk_... from the CROO dashboard (secret)
+      - key: CAPSCORE_API_URL
+        value: https://capscore-agent.onrender.com
+      - key: CAPSCORE_PUBLIC_BASE_URL
+        value: https://capscore-agent.onrender.com
+      - key: MAX_JOB_SECONDS
+        value: "300"

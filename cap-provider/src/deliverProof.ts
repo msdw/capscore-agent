@@ -1,61 +1,66 @@
 import axios from 'axios';
 
-export async function deliverProof(
+/**
+ * Deliver an order result through CAP.
+ *
+ * The CROO protocol records the keccak256 hash of the deliverable on-chain
+ * automatically during deliverOrder — no manual proof field is needed. We still
+ * embed our scorecard summary + internal SHA-256 result hash + proof-pack URL
+ * inside the deliverable text so buyers get a rich, independently verifiable
+ * payload. We also best-effort upload the proof-pack ZIP when the SDK supports it.
+ */
+export async function deliverResult(
   client: any,
   orderId: string,
-  jobResult: any,
-  apiUrl: string
+  job: any,
+  DeliverableType: any,
 ): Promise<void> {
-  const jobId: string = jobResult.job_id;
-  const resultHash: string = jobResult.result_hash || '';
+  const apiUrl = process.env.CAPSCORE_API_URL || 'http://localhost:8000';
   const publicBase = process.env.CAPSCORE_PUBLIC_BASE_URL || apiUrl;
-  const proofPackUrl = `${publicBase}/jobs/${jobId}/proof-pack.zip`;
+  const jobId: string = job.job_id;
 
-  console.log(`[PROOF] Preparing delivery for order=${orderId} job=${jobId}`);
-
-  // --- Download proof pack ---
-  let zipBuffer: Buffer | null = null;
-  try {
-    const resp = await axios.get(`${apiUrl}/jobs/${jobId}/proof-pack.zip`, {
-      responseType: 'arraybuffer',
-      timeout: 30_000,
-    });
-    zipBuffer = Buffer.from(resp.data as ArrayBuffer);
-    console.log(`[PROOF] Downloaded proof pack for job ${jobId}: ${zipBuffer.length} bytes`);
-  } catch (err: any) {
-    console.warn(`[PROOF] Could not download proof pack for job ${jobId}:`, err?.message);
-  }
-
-  // --- Upload proof pack to CROO ---
-  if (zipBuffer !== null && typeof client.uploadFile === 'function') {
+  // Best-effort: attach the full proof-pack ZIP if the SDK exposes uploadFile.
+  if (typeof client.uploadFile === 'function') {
     try {
-      await client.uploadFile(`proof-pack-${jobId}.zip`, zipBuffer);
-      console.log(`[PROOF] Uploaded proof pack for order ${orderId}`);
+      const resp = await axios.get(`${apiUrl}/jobs/${jobId}/proof-pack.zip`, {
+        responseType: 'arraybuffer',
+        timeout: 30_000,
+      });
+      await client.uploadFile(`proof-pack-${jobId}.zip`, Buffer.from(resp.data as ArrayBuffer));
+      console.log(`[DELIVER] uploaded proof pack for ${jobId}`);
     } catch (err: any) {
-      console.warn(`[PROOF] Upload failed for order ${orderId}:`, err?.message);
+      console.warn(`[DELIVER] proof-pack upload skipped:`, err?.message);
     }
-  } else if (zipBuffer === null) {
-    console.warn(`[PROOF] Skipping upload — proof pack not available for job ${jobId}`);
-  } else {
-    console.warn(`[PROOF] client.uploadFile is not available — skipping upload`);
   }
 
-  // --- Deliver order ---
   const deliverable = {
-    deliverableType: 'json',
-    deliverableText: JSON.stringify({
-      job_id: jobId,
-      result_hash: resultHash,
-      proof_pack_url: proofPackUrl,
-      overall_score: jobResult.scorecard?.overall_score ?? null,
-      status: 'delivered',
-    }),
+    capability: job.capability,
+    job_id: jobId,
+    overall_score: job.scorecard?.overall_score,
+    scores: {
+      technical_execution: job.scorecard?.technical_execution?.score,
+      a2a_composability: job.scorecard?.a2a_composability?.score,
+      innovation: job.scorecard?.innovation?.score,
+      adoption_readiness: job.scorecard?.adoption_readiness?.score,
+      presentation_readiness: job.scorecard?.presentation_readiness?.score,
+    },
+    critical_issues: job.scorecard?.critical_issues ?? [],
+    top_fixes: job.scorecard?.top_fixes ?? [],
+    result_hash: job.result_hash,
+    a2a_calls: (job.a2a_calls ?? []).length,
+    proof_pack_url: `${publicBase}/jobs/${jobId}/proof-pack.zip`,
+    report_url: `${publicBase}/jobs/${jobId}/result.md`,
   };
 
+  const textType = DeliverableType?.Text ?? 'text';
   try {
-    await client.deliverOrder(orderId, deliverable);
-    console.log(`[PROOF] Delivered order ${orderId} with result_hash=${resultHash}`);
+    await client.deliverOrder(orderId, {
+      deliverableType: textType,
+      deliverableText: JSON.stringify(deliverable),
+    });
+    console.log(`[DELIVER] order ${orderId} delivered (score=${deliverable.overall_score}, hash=${job.result_hash})`);
   } catch (err: any) {
-    console.error(`[PROOF] deliverOrder failed for order ${orderId}:`, err?.message);
+    console.error(`[DELIVER] deliverOrder failed for ${orderId}:`, err?.message);
+    throw err;
   }
 }
