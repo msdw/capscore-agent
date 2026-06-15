@@ -42,6 +42,8 @@ IGNORE = [
     ".git/*", ".git", ".venv/*", ".venv", "runs/*", "runs",
     "node_modules/*", "**/node_modules/*", ".env", "*.pyc", "__pycache__/*",
     "**/__pycache__/*", "*.egg-info/*", "**/*.egg-info/*",
+    ".pytest_cache/*", "**/.pytest_cache/*", ".build_trigger",
+    "cap-provider/dist/*", "cap-provider/package-lock.json",
 ]
 
 
@@ -58,12 +60,12 @@ def _load_env_file() -> None:
 
 
 def main() -> int:
+    _load_env_file()
     token = os.environ.get("HF_TOKEN")
     if not token:
-        print("ERROR: HF_TOKEN not set", file=sys.stderr)
+        print("ERROR: HF_TOKEN not set (env or .env)", file=sys.stderr)
         return 1
 
-    _load_env_file()
     space_name = sys.argv[1] if len(sys.argv) > 1 else "capscore-agent"
 
     api = HfApi(token=token)
