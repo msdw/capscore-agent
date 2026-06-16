@@ -12,9 +12,9 @@
 
 ## 🎥 Demo
 
-[![Watch the CAPScore demo](https://raw.githubusercontent.com/msdw/capscore-agent/main/docs/assets/dashboard.png)](https://capscore-agent.onrender.com)
+[![Watch the CAPScore demo](https://raw.githubusercontent.com/msdw/capscore-agent/main/docs/assets/dashboard.png)](https://github.com/msdw/capscore-agent/raw/main/docs/assets/demo.mp4)
 
-*▶ Click the image to open the live app, or watch the 5-minute walkthrough: **_<paste YouTube/Loom link>_**.*
+*▶ **[Watch the 2-minute narrated demo](https://github.com/msdw/capscore-agent/raw/main/docs/assets/demo.mp4)** (`docs/assets/demo.mp4`), or open the live app: https://capscore-agent.onrender.com*
 *The screenshot above is the live deployment — note the “Recent Audits” panel: CAPScore audited **its own repository** and scored **86/100** (dogfooding).*
 
 ---
